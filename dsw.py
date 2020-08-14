@@ -86,21 +86,23 @@ def w_tick(ax):
     ax.tick_params(axis='y', colors='w')  
     ax.tick_params(axis='x', colors='w')
 
-def plot_lines(data, plot_time):
+def plot_lines(data, plot_time, window1, window2):
     data_plot = data.iloc[-plot_time:]
     fig = plt.figure(facecolor='#07000d', figsize=(15, 10))  # 画布
-    ax = plt.subplot2grid((6, 4), (1, 0), rowspan=4,colspan=4, facecolor='#07000d')  
+    ax = plt.subplot2grid((9, 4), (1, 0), rowspan=4,colspan=4, facecolor='#07000d')  
 
     ax.grid(True, color='w', axis = 'y')  # 网格
     ax.grid(True, axis = 'x', alpha = 0.3) 
 
     ax.yaxis.label.set_color('w')  # 轴
     plt.ylabel('Stock Price and Volume', color='w')  
+    plt.xticks(ticks =  np.arange(0,len(data_plot)), labels = data_plot.date.dt.strftime('%Y-%m-%d').to_numpy(), rotation=80, size=8)
+    ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  # 横轴-时间
     w_spin(ax)
     w_tick(ax)
 
-    #================================================
-
+    #kline
     candlestick2_ohlc(ax,
                     opens = data_plot[ 'open'].values,
                     highs = data_plot['high'].values,
@@ -108,19 +110,15 @@ def plot_lines(data, plot_time):
                     closes = data_plot['close'].values,
                     width=0.5, colorup='red', colordown='lime')
 
-    #修改xy坐标
-    plt.xticks(ticks =  np.arange(0,len(data_plot)), labels = data_plot.date.dt.strftime('%Y-%m-%d').to_numpy(), rotation=80, size=8)
-    ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))  # 横轴-时间
-
     #=====================================
+    # window日均线
     plot_mat = pd.DataFrame()
     plot_mat['close'] = data['close']
 
-    mov_avg_ten = plot_mat['close'].rolling(window=5).mean() # 每x天收盘价的均值，向下滚动1天
-    mov_avg_thirty = plot_mat['close'].rolling(window=10).mean()  
-    ax.plot(range(plot_time), mov_avg_ten.iloc[-plot_time:], 'lightyellow', label='short_time', linewidth=1.5)  
-    ax.plot(range(plot_time), mov_avg_thirty.iloc[-plot_time:], 'cyan', label='long_time', linewidth=1.5)
+    mov_avg_1 = plot_mat['close'].rolling(window=window1).mean() # x日均线
+    mov_avg_2 = plot_mat['close'].rolling(window=window2).mean()  
+    ax.plot(range(plot_time), mov_avg_1.iloc[-plot_time:], 'lightyellow', label='short_time', linewidth=1.5)  
+    ax.plot(range(plot_time), mov_avg_2.iloc[-plot_time:], 'cyan', label='long_time', linewidth=1.5)
 
     #====================================
     # 成交量图
@@ -136,7 +134,7 @@ def plot_lines(data, plot_time):
 
     #======================================
     #涨跌幅图
-    ax_2 = plt.subplot2grid((6, 4), (0, 0), sharex=ax, rowspan=1, colspan=4, facecolor='#07000d') 
+    ax_2 = plt.subplot2grid((9, 4), (0, 0), sharex=ax, rowspan=1, colspan=4, facecolor='#07000d') 
     data_plot2 = data.iloc[-plot_time-1:]
     raw_time = datef_p_strf(data_plot, '%Y-%m-%d')
 
@@ -154,6 +152,32 @@ def plot_lines(data, plot_time):
 
     w_spin(ax_2)
     ax.tick_params(axis='y', colors='w')
-    # plt.savefig('dsw_test.jpg')
+    #=========================================
+    # 唐奇安通道
+    ax_3 = plt.subplot2grid((9, 4), (6, 0), sharex=ax, rowspan=4, colspan=4, facecolor='#07000d') 
+    data_close = data_plot['close']
+    data_high = data['high']
+    data_low = data['low']
+
+    upbound = []
+    downbound = []
+
+    for i in range(plot_time):
+        upbound.append(max(data_high.iloc[-plot_time+i-20:-plot_time+i]))
+        downbound.append(min(data_low.iloc[-plot_time+i-20:-plot_time+i]))
+
+    ax_3.plot(raw_time, upbound, 'cyan', linewidth = 1)
+    ax_3.plot(raw_time, downbound, 'cyan', linewidth = 1)
+    ax_3.plot(raw_time, data_close, 'orange', linewidth = 2)
+
+    w_spin(ax_3)
+    w_tick(ax_3)
+    ax_3.grid(True, color='w', axis = 'y')  # 网格
+    ax_3.grid(True, axis = 'x', alpha = 0.3) 
+
+    ax_3.tick_params(axis='x',colors='#07000d')
+    plt.ylabel('Dochian Channel', color='w') 
+
     #========================================
+    # plt.savefig('dsw_test.jpg')
     plt.show()
