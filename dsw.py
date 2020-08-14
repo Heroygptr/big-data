@@ -63,10 +63,10 @@ def data_300(data):
     return data_
 
 def plot_comp(df1, df2, df3, df4):
-    df1 = data_300(data_sh)
-    df2 = data_300(data_hw)
-    df3 = data_300(data_xj)
-    df4 = data_300(data_sj)
+    df1 = data_300(df1)
+    df2 = data_300(df2)
+    df3 = data_300(df3)
+    df4 = data_300(df4)
 
     fig, ax = plt.subplots()
     df1.plot(ax=ax, y='close', label='01')
