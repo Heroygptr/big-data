@@ -1,7 +1,11 @@
 # analysis of SHANGHAI ELECTRIC(sh601727)
 这个项目对上海电气的股票信息进行了整理和分析<br>
-大盘情况和上海电气股价涨跌简析请看`上证和上海电气指数图`<sup>hzy</sup>，参考内容移步`参考资料`。`Kline`<sup>nzg</sup>绘制了K线图与5、10日均线。  
+大盘情况和上海电气股价涨跌简析请看`上证和上海电气指数图`<sup>hzy</sup>，参考内容移步`参考资料`。  
+
+`Kline`<sup>nzg</sup>绘制了K线图与5、10日均线。 
+
 `涨跌势（直方图），核密度`<sup>wkl</sup>绘制了直方图。  
+
 `dsw_plot`<sup>dsw</sup>绘制了四只股票的比较。
 
 # 功能
