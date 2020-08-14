@@ -75,6 +75,18 @@ def plot_comp(df1, df2, df3, df4):
     df4.plot(ax=ax, y='close', label='04')
 
     plt.legend(loc='upper left')
+    plt.ylabel('Stock Price', color='black') 
+    plt.show() 
+
+    #=====================
+    mean_share_list = [df1['close'].mean(), df2['close'].mean(), df3['close'].mean(), df4['close'].mean()]
+    mean_share_series = pd.Series(mean_share_list, index=['01', '02', '03', '04'])
+    mean_share_series.plot(kind='bar')
+    plt.xticks(rotation=360)  
+
+    plt.ylabel('Price Bar', color='black')  
+    plt.show()
+
 
 def w_spin(ax):
     ax.spines['bottom'].set_color('w') 
@@ -89,7 +101,7 @@ def w_tick(ax):
 def plot_lines(data, plot_time, window1, window2):
     data_plot = data.iloc[-plot_time:]
     fig = plt.figure(facecolor='#07000d', figsize=(15, 10))  # 画布
-    ax = plt.subplot2grid((9, 4), (1, 0), rowspan=4,colspan=4, facecolor='#07000d')  
+    ax = plt.subplot2grid((10, 4), (2, 0), rowspan=4,colspan=4, facecolor='#07000d')  
 
     ax.grid(True, color='w', axis = 'y')  # 网格
     ax.grid(True, axis = 'x', alpha = 0.3) 
@@ -134,7 +146,7 @@ def plot_lines(data, plot_time, window1, window2):
 
     #======================================
     #涨跌幅图
-    ax_2 = plt.subplot2grid((9, 4), (0, 0), sharex=ax, rowspan=1, colspan=4, facecolor='#07000d') 
+    ax_2 = plt.subplot2grid((10, 4), (0, 0), sharex=ax, rowspan=2, colspan=4, facecolor='#07000d') 
     data_plot2 = data.iloc[-plot_time-1:]
     raw_time = datef_p_strf(data_plot, '%Y-%m-%d')
 
@@ -154,7 +166,7 @@ def plot_lines(data, plot_time, window1, window2):
     ax.tick_params(axis='y', colors='w')
     #=========================================
     # 唐奇安通道
-    ax_3 = plt.subplot2grid((9, 4), (6, 0), sharex=ax, rowspan=4, colspan=4, facecolor='#07000d') 
+    ax_3 = plt.subplot2grid((10, 4), (7, 0), sharex=ax, rowspan=4, colspan=4, facecolor='#07000d') 
     data_close = data_plot['close']
     data_high = data['high']
     data_low = data['low']
