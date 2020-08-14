@@ -5,10 +5,22 @@ import matplotlib.pyplot as plt
 
 import dsw
 
-df = dsw.query_stock("shdq").dropna().reset_index()
-plot_time = 50
+plot_time = 50     #在此定义画多少天的k线
 
-dsw.plot_lines(df, plot_time)
+df = dsw.query_stock("shdq").dropna().reset_index()
+dsw.plot_lines(df, plot_time, 5, 10)   #在此定义多少天均线
+
+#%%
+df2 = dsw.query_stock("hwdq").dropna().reset_index()
+dsw.plot_lines(df2, plot_time, 5, 10)
+
+#%%
+df3 = dsw.query_stock("xjdq").dropna().reset_index()
+dsw.plot_lines(df3, plot_time, 5, 10)
+
+#%%
+df4 = dsw.query_stock("sjdq").dropna().reset_index()
+dsw.plot_lines(df4, plot_time, 5, 10)
 
 #%%
 import dsw
