@@ -16,6 +16,7 @@ from matplotlib.pyplot import MultipleLocator
 query_dis = {"shdq":"sh601727", "hwdq":"sh603063", \
     "xjdq":"sz000400", "sjdq":"sz300444"}
 
+#查询股票的函数===================================================================================
 def query_stock(stock_name):
     stock = ak.stock_zh_a_daily(symbol = query_dis[stock_name], adjust="hfq")
     return stock
@@ -40,7 +41,8 @@ def query_sjdq():
     stock = query_stock("sjdq")
     return stock
 
-def datef_p_strf(data, date_format):     #date-dateformat时  导出str-rawtime
+# 对时间格式的处理函数===================================================================================
+def datef_p_strf(data, date_format):     #date格式为dateformat时  导出str类型的rawtime
     dates = data['date']  
     raw_time = []
 
@@ -48,7 +50,7 @@ def datef_p_strf(data, date_format):     #date-dateformat时  导出str-rawtime
         raw_time.append(i.strftime(date_format))
     return raw_time
 
-def strf_p_datef(data, date_format):    #date-str时  导出dateform-date
+def strf_p_datef(data, date_format):    #date格式为str时  导出dateform类型的date
     raw_time = data.pop('date')  
     dates = []
 
@@ -58,36 +60,12 @@ def strf_p_datef(data, date_format):    #date-str时  导出dateform-date
     data['date'] = dates
     return dates
 
+#切片函数============================================================================================
 def data_300(data):
     data_ = data.iloc[-300:, :]
     return data_
 
-def plot_comp(df1, df2, df3, df4):
-    df1 = data_300(df1)
-    df2 = data_300(df2)
-    df3 = data_300(df3)
-    df4 = data_300(df4)
-
-    fig, ax = plt.subplots()
-    df1.plot(ax=ax, y='close', label='01')
-    df2.plot(ax=ax, y='close', label='02')
-    df3.plot(ax=ax, y='close', label='03')
-    df4.plot(ax=ax, y='close', label='04')
-
-    plt.legend(loc='upper left')
-    plt.ylabel('Stock Price', color='black') 
-    plt.show() 
-
-    #=====================
-    mean_share_list = [df1['close'].mean(), df2['close'].mean(), df3['close'].mean(), df4['close'].mean()]
-    mean_share_series = pd.Series(mean_share_list, index=['01', '02', '03', '04'])
-    mean_share_series.plot(kind='bar')
-    plt.xticks(rotation=360)  
-
-    plt.ylabel('Price Bar', color='black')  
-    plt.show()
-
-
+#画图函数中设置边框为白色===============================================================================
 def w_spin(ax):
     ax.spines['bottom'].set_color('w') 
     ax.spines['top'].set_color('w') 
@@ -97,6 +75,34 @@ def w_spin(ax):
 def w_tick(ax):
     ax.tick_params(axis='y', colors='w')  
     ax.tick_params(axis='x', colors='w')
+
+#画图函数=============================================================================================
+def plot_comp(df1, df2, df3, df4):
+    df1 = data_300(df1)
+    df2 = data_300(df2)
+    df3 = data_300(df3)
+    df4 = data_300(df4)
+
+    #收盘价==================================
+    fig, ax = plt.subplots()
+    df1.plot(ax=ax, y='close', label='01')
+    df2.plot(ax=ax, y='close', label='02')
+    df3.plot(ax=ax, y='close', label='03')
+    df4.plot(ax=ax, y='close', label='04')
+
+
+    plt.legend(loc='upper left')
+    plt.ylabel('Stock Price', color='black') 
+    plt.show() 
+
+    #收盘总量=====================
+    mean_share_list = [df1['close'].mean(), df2['close'].mean(), df3['close'].mean(), df4['close'].mean()]
+    mean_share_series = pd.Series(mean_share_list, index=['01', '02', '03', '04'])
+    mean_share_series.plot(kind='bar')
+    plt.xticks(rotation=360)  
+
+    plt.ylabel('Price Bar', color='black')  
+    plt.show()
 
 def plot_lines(data, plot_time, window1, window2):
     data_plot = data.iloc[-plot_time:]
@@ -114,7 +120,7 @@ def plot_lines(data, plot_time, window1, window2):
     w_spin(ax)
     w_tick(ax)
 
-    #kline
+    #kline=================================
     candlestick2_ohlc(ax,
                     opens = data_plot[ 'open'].values,
                     highs = data_plot['high'].values,
@@ -122,8 +128,7 @@ def plot_lines(data, plot_time, window1, window2):
                     closes = data_plot['close'].values,
                     width=0.5, colorup='red', colordown='lime')
 
-    #=====================================
-    # window日均线
+    #5日10日均线=====================================
     plot_mat = pd.DataFrame()
     plot_mat['close'] = data['close']
 
@@ -132,8 +137,7 @@ def plot_lines(data, plot_time, window1, window2):
     ax.plot(range(plot_time), mov_avg_1.iloc[-plot_time:], 'lightyellow', label='short_time', linewidth=1.5)  
     ax.plot(range(plot_time), mov_avg_2.iloc[-plot_time:], 'cyan', label='long_time', linewidth=1.5)
 
-    #====================================
-    # 成交量图
+    #成交量图====================================
     Volume = data_plot[['date', 'volume']].groupby(by='date').sum().reset_index()
 
     ax_1 = ax.twinx()  # 共享绘图区域
@@ -144,8 +148,7 @@ def plot_lines(data, plot_time, window1, window2):
     w_spin(ax_1)
     w_tick(ax_1)
 
-    #======================================
-    #涨跌幅图
+    #涨跌幅图=====================================
     ax_2 = plt.subplot2grid((10, 4), (0, 0), sharex=ax, rowspan=2, colspan=4, facecolor='#07000d') 
     data_plot2 = data.iloc[-plot_time-1:]
     raw_time = datef_p_strf(data_plot, '%Y-%m-%d')
@@ -164,8 +167,8 @@ def plot_lines(data, plot_time, window1, window2):
 
     w_spin(ax_2)
     ax.tick_params(axis='y', colors='w')
-    #=========================================
-    # 唐奇安通道
+
+    #唐奇安通道=========================================
     ax_3 = plt.subplot2grid((10, 4), (7, 0), sharex=ax, rowspan=4, colspan=4, facecolor='#07000d') 
     data_close = data_plot['close']
     data_high = data['high']
